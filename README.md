@@ -1,3 +1,16 @@
+# S&AN
+
+S&AN is a customized photo and video server based on Immich, with cyan branding for web and Android.
+
+This source snapshot derives from upstream commit `8e105398860a1283ad1cc4b4c52729f970636c4a` at https://github.com/immich-app/immich. Original copyright notices and the AGPL-3.0 license are retained. This is an independent customization, not an official Immich release.
+
+Current changes include branding and production networking hardening. Administrative APK publication, removable-volume management and verified disk migration are not implemented yet. Do not treat this repository as a completed production storage system.
+
+The public repository excludes infrastructure environment files and upstream automation workflows. Never commit deployment secrets, signing keys, personal photos or database backups. Test-only cryptographic fixtures inherited from upstream are not production credentials.
+
+See `docker/README.md` for the current deployment limitations.
+
+---
 <p align="center"> 
   <br/>
   <a href="https://opensource.org/license/agpl-v3"><img src="https://img.shields.io/badge/License-AGPL_v3-blue.svg?color=3F51B5&style=for-the-badge&label=License&logoColor=000000&labelColor=ececec" alt="License: AGPLv3"></a>
