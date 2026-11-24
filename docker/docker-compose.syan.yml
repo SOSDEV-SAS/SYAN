@@ -1,0 +1,40 @@
+name: syan
+
+services:
+  immich-server:
+    container_name: syan_server
+    image: syan-server:${SYAN_REVISION:?Set the source commit}
+    ports: !reset []
+    networks:
+      - default
+      - proxy
+    environment:
+      IMMICH_ALLOW_SETUP: 'false'
+    labels:
+      traefik.enable: '${SYAN_PUBLIC_ENABLED:-false}'
+      traefik.docker.network: proxy
+      traefik.http.routers.syan.rule: Host(`syan.sosdev.com.co`)
+      traefik.http.routers.syan.entrypoints: web
+      traefik.http.services.syan.loadbalancer.server.port: '2283'
+
+  immich-machine-learning:
+    container_name: syan_machine_learning
+    image: syan-machine-learning:${SYAN_REVISION:?Set the source commit}
+    env_file: !reset []
+
+  redis:
+    container_name: syan_redis
+
+  database:
+    container_name: syan_postgres
+    env_file: !reset []
+
+  immich-prometheus:
+    container_name: syan_prometheus
+
+  immich-grafana:
+    container_name: syan_grafana
+
+networks:
+  proxy:
+    external: true

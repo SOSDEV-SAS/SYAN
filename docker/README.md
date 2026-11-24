@@ -39,3 +39,13 @@ The existing Gradle configuration falls back to debug signing when the release k
 The source review found CORS enabled only in development and Android backups already disabled. This is not a full authentication/authorization audit, dependency advisory scan, secret-history audit or penetration test. Review custom-header forwarding, APK signing, dependency advisories, authenticated sharing and access-control isolation before production acceptance.
 
 Validation in the current Windows checkout is limited to Compose configuration rendering, XML parsing and diff checks. There are no installed workspace dependencies, and mise and Flutter were not found on PATH. API/web tests, APK build/signature verification, live TLS/proxy behavior and physical-device tests remain pending. No deployment, data migration or deletion was performed.
+
+## S&AN host deployment
+
+Use the production Compose together with `docker-compose.syan.yml`, through `mise //:syan:build` and `mise //:syan:up`. The overlay isolates container names, joins the existing external `proxy` network and publishes no API host port. Set `SYAN_REVISION` to the source commit, and set `IMMICH_TRUSTED_PROXIES` to the exact current Traefik address as seen on that network. Configure a stable proxy address before long-term operation.
+
+The private `docker/.env` must contain `UPLOAD_LOCATION`, `DB_USERNAME`, `DB_DATABASE_NAME`, a unique `DB_PASSWORD`, `SYAN_REVISION` and `IMMICH_TRUSTED_PROXIES`. Do not place photos or database files in this checkout. Restrict the environment file to its owner. Verify storage capacity, backups and bind mounts before starting services.
+
+Public routing defaults to disabled (`SYAN_PUBLIC_ENABLED=false`), and initial account setup is disabled. Bootstrap the administrator only through a temporary local-only override enabling setup and binding `127.0.0.1:2283`, reached through an SSH tunnel. Remove that override after creating the administrator, confirm setup is disabled, then set `SYAN_PUBLIC_ENABLED=true` and rerun the up task. This prevents exposing unauthenticated first-admin registration to the Internet.
+
+Before enabling routing, verify all container health checks, administrator authentication, an upload/download round trip and restored backup. Then verify HTTPS and login through the actual domain. APK distribution and managed removable disks remain unavailable in this version.

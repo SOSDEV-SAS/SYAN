@@ -194,3 +194,11 @@ run = [
   "find . -name '.pnpm-store' -type d -prune -exec rm -rf '{}' +",
   { task = "//:*-down" },
 ]
+
+[tasks."syan:build"]
+dir = "docker"
+run = "docker compose -f docker-compose.prod.yml -f docker-compose.syan.yml build"
+
+[tasks."syan:up"]
+dir = "docker"
+run = "docker compose -f docker-compose.prod.yml -f docker-compose.syan.yml up -d --wait"
