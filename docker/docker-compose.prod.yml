@@ -24,8 +24,11 @@ services:
       - /etc/localtime:/etc/localtime:ro
     env_file:
       - .env
+    environment:
+      IMMICH_HELMET_FILE: 'true'
+      IMMICH_TRUSTED_PROXIES: ${IMMICH_TRUSTED_PROXIES:?Set the exact reverse proxy IP or CIDR}
     ports:
-      - 2283:2283
+      - '127.0.0.1:2283:2283'
     depends_on:
       - redis
       - database
@@ -44,8 +47,6 @@ services:
       dockerfile: Dockerfile
       args:
         - DEVICE=cpu # set to one of [armnn, cuda, rocm, openvino, openvino-wsl, rknn] for accelerated inference
-    ports:
-      - 3003:3003
     volumes:
       - model-cache:/cache
     env_file:
@@ -67,14 +68,12 @@ services:
     env_file:
       - .env
     environment:
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set a unique database password}
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_DB: ${DB_DATABASE_NAME}
       POSTGRES_INITDB_ARGS: '--data-checksums'
     volumes:
       - ${UPLOAD_LOCATION}/postgres:/var/lib/postgresql/data
-    ports:
-      - 5432:5432
     shm_size: 128mb
     restart: always
     healthcheck:
@@ -82,9 +81,10 @@ services:
 
   # set IMMICH_TELEMETRY_INCLUDE=all in .env to enable metrics
   immich-prometheus:
+    profiles: ['monitoring']
     container_name: immich_prometheus
     ports:
-      - 9090:9090
+      - '127.0.0.1:9090:9090'
     image: prom/prometheus@sha256:e04987641b57704f408e31f6373ba4138ecf27cb4a165d24aabb6c38fddd0f06
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
@@ -93,10 +93,11 @@ services:
   # first login uses admin/admin
   # add data source for http://immich-prometheus:9090 to get started
   immich-grafana:
+    profiles: ['monitoring']
     container_name: immich_grafana
     command: ['./run.sh', '-disable-reporting']
     ports:
-      - 3000:3000
+      - '127.0.0.1:3000:3000'
     image: grafana/grafana:13.3.1-ubuntu@sha256:511d90dcb449f732286cd80f640ea21aa1ebabf609451c44e65d88be0e06f215
     volumes:
       - grafana-data:/var/lib/grafana
