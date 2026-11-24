@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Logo from '#lib/elements/BrandLogo.svelte';
   import AlbumViewer from '#lib/components/album-page/AlbumViewer.svelte';
   import IndividualSharedViewer from '#lib/components/share-page/IndividualSharedViewer.svelte';
   import ControlAppBar from '#lib/components/shared-components/ControlAppBar.svelte';
@@ -9,7 +10,7 @@
   import { setSharedLink } from '#lib/utils.ts';
   import { navigate } from '#lib/utils/navigation.ts';
   import { SharedLinkType, type AssetResponseDto, type SharedLinkResponseDto } from '@immich/sdk';
-  import { Button, Logo, PasswordInput } from '@immich/ui';
+  import { Button, PasswordInput } from '@immich/ui';
   import { createMutation } from '@tanstack/svelte-query';
   import { onDestroy, tick } from 'svelte';
   import { t } from 'svelte-i18n';
@@ -45,7 +46,7 @@
     sharedLink = link;
     setSharedLink(link);
     passwordRequired = false;
-    title = (link.album ? link.album.albumName : $t('public_share')) + ' - Immich';
+    title = (link.album ? link.album.albumName : $t('public_share')) + ' - S&AN';
     await tick();
     await navigate(
       { targetRoute: 'current', assetId: null, assetGridRouteSearchParams: assetViewerManager.gridScrollTarget },

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Logo from '#lib/elements/BrandLogo.svelte';
   import { OpenQueryParam } from '#lib/constants.ts';
   import Portal from '#lib/elements/Portal.svelte';
   import { authManager } from '#lib/managers/auth-manager.svelte.ts';
@@ -7,7 +8,7 @@
   import { Route } from '#lib/route.ts';
   import { getAccountAge } from '#lib/utils/auth.ts';
   import { getButtonVisibility } from '#lib/utils/purchase-utils.ts';
-  import { Button, Icon, IconButton, Logo, SupporterBadge, modalManager } from '@immich/ui';
+  import { Button, Icon, IconButton, SupporterBadge, modalManager } from '@immich/ui';
   import { mdiClose, mdiInformationOutline } from '@mdi/js';
   import { createMutation } from '@tanstack/svelte-query';
   import { t } from 'svelte-i18n';

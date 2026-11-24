@@ -2,6 +2,38 @@
 @import '@immich/ui/theme/default.css';
 
 @source "../node_modules/@immich/ui";
+
+:root, .light {
+  --immich-ui-primary-50: #ecfeff;
+  --immich-ui-primary-100: #cffafe;
+  --immich-ui-primary-200: #a5f3fc;
+  --immich-ui-primary-300: #67e8f9;
+  --immich-ui-primary-400: #22d3ee;
+  --immich-ui-primary-500: #007f8b;
+  --immich-ui-primary-600: #0e7490;
+  --immich-ui-primary-700: #155e75;
+  --immich-ui-primary-800: #164e63;
+  --immich-ui-primary-900: #083344;
+  --immich-ui-primary-950: #04252f;
+}
+
+.dark {
+  --immich-ui-primary-50: #10272c;
+  --immich-ui-primary-100: #163b42;
+  --immich-ui-primary-200: #1b5058;
+  --immich-ui-primary-300: #226771;
+  --immich-ui-primary-400: #29818a;
+  --immich-ui-primary-500: #22d3dd;
+  --immich-ui-primary-600: #67e8f9;
+  --immich-ui-primary-700: #a5f3fc;
+  --immich-ui-primary-800: #cffafe;
+  --immich-ui-primary-900: #ecfeff;
+  --immich-ui-primary-950: #f5feff;
+  --immich-ui-light: #10181c;
+  --immich-ui-light-50: #10181c;
+  --immich-ui-light-100: #19242a;
+  --immich-ui-light-200: #26363e;
+}
 /* @import '../../../ui/packages/ui/dist/theme/default.css'; */
 
 @custom-variant dark (&:where(.dark, .dark *):not(.light));
@@ -88,15 +120,15 @@
 @layer base {
   :root {
     /* light */
-    --immich-primary: 66 80 175;
+    --immich-primary: 0 127 139;
     --immich-bg: 255 255 255;
     --immich-fg: 0 0 0;
 
     /* dark */
-    --immich-dark-primary: 172 203 250;
-    --immich-dark-bg: 10 10 10;
+    --immich-dark-primary: 34 211 221;
+    --immich-dark-bg: 16 24 28;
     --immich-dark-fg: 229 231 235;
-    --immich-dark-gray: 33 33 33;
+    --immich-dark-gray: 25 36 42;
   }
 
   button:not(:disabled),

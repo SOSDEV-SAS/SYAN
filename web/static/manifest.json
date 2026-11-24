@@ -1,5 +1,5 @@
 {
-  "background_color": "#ffffff",
+  "background_color": "#10181c",
   "description": "Self-hosted photo and video backup solution directly from your mobile phone.",
   "dir": "auto",
   "display": "standalone",
@@ -18,8 +18,8 @@
     }
   ],
   "lang": "en",
-  "name": "Immich",
-  "short_name": "Immich",
+  "name": "S&AN",
+  "short_name": "S&AN",
   "shortcuts": [
     {
       "name": "Photos",
