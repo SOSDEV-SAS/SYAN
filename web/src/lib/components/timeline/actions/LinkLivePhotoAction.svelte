@@ -1,0 +1,91 @@
+<script lang="ts">
+  import MenuOption from '#lib/components/shared-components/context-menu/MenuOption.svelte';
+  import { assetMultiSelectManager } from '#lib/managers/asset-multi-select-manager.svelte.ts';
+  import { authManager } from '#lib/managers/auth-manager.svelte.ts';
+  import type { TimelineAsset } from '#lib/managers/timeline-manager/types.ts';
+  import { updateAssetMutation } from '#lib/queries/asset.query.ts';
+  import { executeMutation } from '#lib/queries/client.ts';
+  import type { OnLink, OnUnlink } from '#lib/utils/actions.ts';
+  import { toTimelineAsset } from '#lib/utils/timeline-util.ts';
+  import { getAssetInfo } from '@immich/sdk';
+  import { IconButton } from '@immich/ui';
+  import { mdiLinkOff, mdiMotionPlayOutline, mdiTimerSand } from '@mdi/js';
+  import { t } from 'svelte-i18n';
+
+  interface Props {
+    onLink: OnLink;
+    onUnlink: OnUnlink;
+    menuItem?: boolean;
+    unlink?: boolean;
+  }
+
+  let { onLink, onUnlink, menuItem = false, unlink = false }: Props = $props();
+
+  let loading = $state(false);
+
+  let text = $derived(unlink ? $t('unlink_motion_video') : $t('link_motion_video'));
+  let icon = $derived(unlink ? mdiLinkOff : mdiMotionPlayOutline);
+
+  const onClick = () => (unlink ? handleUnlink() : handleLink());
+
+  const handleLink = async () => {
+    let [still, motion] = assetMultiSelectManager.ownedAssets;
+    if ((still as TimelineAsset).isVideo) {
+      [still, motion] = [motion, still];
+    }
+
+    loading = true;
+    await executeMutation(
+      () => updateAssetMutation({ error: { toast: 'errors.unable_to_link_motion_video' } }),
+      [{ id: still.id, updateAssetDto: { livePhotoVideoId: motion.id } }],
+      {
+        onSuccess: (stillResponse) => {
+          onLink({ still: toTimelineAsset(stillResponse), motion: motion as TimelineAsset });
+          assetMultiSelectManager.clear();
+        },
+      },
+    );
+    loading = false;
+  };
+
+  const handleUnlink = async () => {
+    const [still] = assetMultiSelectManager.ownedAssets;
+    if (!still) {
+      return;
+    }
+    const motionId = still.livePhotoVideoId;
+    if (!motionId) {
+      return;
+    }
+    loading = true;
+    const stillResponse = await executeMutation(
+      () => updateAssetMutation({ error: { toast: 'errors.unable_to_unlink_motion_video' } }),
+      [{ id: still.id, updateAssetDto: { livePhotoVideoId: null } }],
+    );
+    if (stillResponse) {
+      const motionResponse = await getAssetInfo({ ...authManager.params, id: motionId });
+      onUnlink({ still: toTimelineAsset(stillResponse), motion: toTimelineAsset(motionResponse) });
+      assetMultiSelectManager.clear();
+    }
+    loading = false;
+  };
+</script>
+
+{#if menuItem}
+  <MenuOption {text} {icon} {onClick} />
+{/if}
+
+{#if !menuItem}
+  {#if loading}
+    <IconButton
+      shape="round"
+      color="secondary"
+      variant="ghost"
+      aria-label={$t('loading')}
+      icon={mdiTimerSand}
+      onclick={() => {}}
+    />
+  {:else}
+    <IconButton shape="round" color="secondary" variant="ghost" aria-label={text} {icon} onclick={onClick} />
+  {/if}
+{/if}
