@@ -3,6 +3,7 @@ import { QueueName } from 'src/enum.js';
 type IdParams = { id: string };
 
 export const Resource = {
+  apkReleases: () => '/android-releases',
   activities: () => '/activities',
   activityStatistics: () => '/activities/statistics',
 

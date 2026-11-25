@@ -1,4 +1,5 @@
 <script lang="ts">
+  import ApkDownload from '#lib/components/shared-components/ApkDownload.svelte';
   import AuthPageLayout from '#lib/components/layouts/AuthPageLayout.svelte';
   import { eventManager } from '#lib/managers/event-manager.svelte.ts';
   import { loginMutation } from '#lib/queries/auth.query.ts';
@@ -221,4 +222,5 @@
       <Alert color="warning" title={$t('login_has_been_disabled')} />
     {/if}
   </Stack>
+  <ApkDownload />
 </AuthPageLayout>

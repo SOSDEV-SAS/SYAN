@@ -35,6 +35,8 @@ const asQueryString = (params?: Record<string, QueryValue | undefined>) => {
 };
 
 export const Route = {
+  androidReleases: () => '/admin/android-releases',
+  apkDownload: () => '/api/android-releases/download',
   // auth
   login: (params?: { continue?: string; autoLaunch?: 0 | 1 }) => '/auth/login' + asQueryString(params),
   logout: (params?: { continue?: string }) => '/auth/logout' + asQueryString(params),

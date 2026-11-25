@@ -85,3 +85,6 @@ run = [
   { task = ":build" },
   "pnpm run test:medium",
 ]
+
+[tasks.format-files]
+run = "pnpm exec prettier --write {{arg(name='files', var=true)}}"

@@ -1,3 +1,4 @@
+import { ApkService } from 'src/services/apk.service.js';
 import { ActivityService } from 'src/services/activity.service.js';
 import { AlbumService } from 'src/services/album.service.js';
 import { ApiKeyService } from 'src/services/api-key.service.js';
@@ -56,6 +57,7 @@ import { WorkflowService } from 'src/services/workflow.service.js';
 
 export const services = [
   ApiKeyService,
+  ApkService,
   ActivityService,
   AlbumService,
   ApiService,

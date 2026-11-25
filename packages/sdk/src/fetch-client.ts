@@ -1023,6 +1023,46 @@ export type AddUsersDto = {
     /** Album users to add */
     albumUsers: AlbumUserAddDto[];
 };
+export type ApkAdminResponseDto = {
+    certificateSha256: string | null;
+    publishedId: string | null;
+    releases: {
+        certificateSha256: string;
+        id: string;
+        packageName: string;
+        sha256: string;
+        size: number;
+        uploadedAt: string;
+        uploadedBy: string;
+        versionCode: number;
+        versionName: string;
+    }[];
+};
+export type ApkReleaseResponseDto = {
+    certificateSha256: string;
+    id: string;
+    packageName: string;
+    sha256: string;
+    size: number;
+    uploadedAt: string;
+    uploadedBy: string;
+    versionCode: number;
+    versionName: string;
+};
+export type ApkPublicResponseDto = {
+    release: {
+        id: string;
+        packageName: string;
+        sha256: string;
+        size: number;
+        uploadedAt: string;
+        versionCode: number;
+        versionName: string;
+    } | null;
+};
+export type ApkPublishDto = {
+    id: string | null;
+};
 export type ApiKeyResponseDto = {
     /** Creation date */
     createdAt: string;
@@ -4725,6 +4765,82 @@ export function addUsersToAlbum({ id, addUsersDto }: {
         method: "PUT",
         body: addUsersDto
     })));
+}
+/**
+ * List Android releases
+ */
+export function getApkReleases(opts?: Oazapfts.RequestOpts) {
+    return oazapfts.ok(oazapfts.fetchJson<{
+        status: 200;
+        data: ApkAdminResponseDto;
+    }>("/android-releases", {
+        ...opts
+    }));
+}
+/**
+ * Upload signed Android release
+ */
+export function uploadApk({ body }: {
+    body: {
+        file: Blob;
+    };
+}, opts?: Oazapfts.RequestOpts) {
+    return oazapfts.ok(oazapfts.fetchJson<{
+        status: 201;
+        data: ApkReleaseResponseDto;
+    }>("/android-releases", oazapfts.multipart({
+        ...opts,
+        method: "POST",
+        body
+    })));
+}
+/**
+ * Download published Android release
+ */
+export function downloadPublishedApk(opts?: Oazapfts.RequestOpts) {
+    return oazapfts.ok(oazapfts.fetchBlob<{
+        status: 200;
+        data: Blob;
+    }>("/android-releases/download", {
+        ...opts
+    }));
+}
+/**
+ * Get published Android release
+ */
+export function getPublishedApk(opts?: Oazapfts.RequestOpts) {
+    return oazapfts.ok(oazapfts.fetchJson<{
+        status: 200;
+        data: ApkPublicResponseDto;
+    }>("/android-releases/published", {
+        ...opts
+    }));
+}
+/**
+ * Publish or withdraw Android release
+ */
+export function publishApk({ apkPublishDto }: {
+    apkPublishDto: ApkPublishDto;
+}, opts?: Oazapfts.RequestOpts) {
+    return oazapfts.ok(oazapfts.fetchJson<{
+        status: 200;
+        data: ApkAdminResponseDto;
+    }>("/android-releases/published", oazapfts.json({
+        ...opts,
+        method: "PUT",
+        body: apkPublishDto
+    })));
+}
+/**
+ * Remove unpublished Android release
+ */
+export function deleteApk({ id }: {
+    id: string;
+}, opts?: Oazapfts.RequestOpts) {
+    return oazapfts.ok(oazapfts.fetchText(`/android-releases/${encodeURIComponent(id)}`, {
+        ...opts,
+        method: "DELETE"
+    }));
 }
 /**
  * List all API keys

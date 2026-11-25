@@ -79,3 +79,6 @@ run = [
     "verify-order",
   ] },
 ]
+
+[tasks.format-files]
+run = "pnpm exec prettier --write {{arg(name='files', var=true)}}"

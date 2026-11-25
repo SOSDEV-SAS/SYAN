@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { ZipArchive } from 'archiver';
 import { ChokidarOptions, watch as chokidarWatch } from 'chokidar';
 import fastGlob from 'fast-glob';
+import { execFile } from 'node:child_process';
+import { createHash, randomUUID } from 'node:crypto';
 import {
   Dirent,
   ReadOptionsWithBuffer,
@@ -15,10 +17,12 @@ import {
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { PassThrough, Readable, Writable } from 'node:stream';
+import { promisify } from 'node:util';
 import { createGunzip, createGzip } from 'node:zlib';
 import picomatch from 'picomatch';
 import { CrawlOptionsDto, WalkOptionsDto } from 'src/dtos/library.dto.js';
 import { LoggingRepository } from 'src/repositories/logging.repository.js';
+import { parseApkInspection } from 'src/utils/apk.js';
 import { mimeTypes } from 'src/utils/mime-types.js';
 
 export interface WatchEvents {
@@ -51,6 +55,37 @@ export interface DiskUsage {
 
 @Injectable()
 export class StorageRepository {
+  getApkPath(id: string) {
+    if (!/^[a-f\d-]{36}$/i.test(id)) {
+      throw new Error('Invalid APK identifier');
+    }
+    return path.join('/var/lib/syan/apks', `${id}.apk`);
+  }
+
+  async stageApk(source: string) {
+    const execute = promisify(execFile);
+    const options = { timeout: 60_000, maxBuffer: 2 * 1024 * 1024, windowsHide: true };
+    const { stdout: signature } = await execute('apksigner', ['verify', '--verbose', '--print-certs', source], options);
+    const { stdout: manifest } = await execute('aapt', ['dump', 'badging', source], options);
+    const identity = parseApkInspection(manifest, signature);
+    const id = randomUUID();
+    const destination = this.getApkPath(id);
+    await fs.mkdir(path.dirname(destination), { recursive: true, mode: 0o700 });
+    await fs.copyFile(source, destination, constants.COPYFILE_EXCL);
+    try {
+      await fs.chmod(destination, 0o600);
+      const hash = createHash('sha256');
+      for await (const chunk of createReadStream(destination)) {
+        hash.update(chunk);
+      }
+      const { size } = await fs.stat(destination);
+      return { ...identity, id, sha256: hash.digest('hex'), size };
+    } catch (error) {
+      await fs.unlink(destination);
+      throw error;
+    }
+  }
+
   constructor(private logger: LoggingRepository) {
     this.logger.setContext(StorageRepository.name);
   }

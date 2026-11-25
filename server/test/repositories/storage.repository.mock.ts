@@ -47,6 +47,8 @@ export const newStorageRepositoryMock = (): Mocked<RepositoryInterface<StorageRe
   StorageCore.setMediaLocation('/data');
 
   return {
+    getApkPath: vitest.fn(),
+    stageApk: vitest.fn(),
     createZipStream: vitest.fn(),
     createPlainReadStream: vitest.fn(),
     createReadStream: vitest.fn(),

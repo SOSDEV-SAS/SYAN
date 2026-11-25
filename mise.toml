@@ -202,3 +202,7 @@ run = "docker compose -f docker-compose.prod.yml -f docker-compose.syan.yml buil
 [tasks."syan:up"]
 dir = "docker"
 run = "docker compose -f docker-compose.prod.yml -f docker-compose.syan.yml up -d --wait"
+[tasks."syan:format"]
+run = "pnpm exec prettier --write {{arg(name='files', var=true)}}"
+[tasks."syan:image"]
+run = "docker build --progress=plain -f server/Dockerfile -t syan-server:{{env.SYAN_REVISION}} ."

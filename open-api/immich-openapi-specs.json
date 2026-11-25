@@ -3239,6 +3239,292 @@
         "x-immich-state": "Stable"
       }
     },
+    "/android-releases": {
+      "get": {
+        "description": "List Android releases for S&AN.",
+        "operationId": "getApkReleases",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApkAdminResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "cookie": []
+          },
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "List Android releases",
+        "tags": [
+          "Server"
+        ],
+        "x-immich-admin-only": true,
+        "x-immich-history": [
+          {
+            "state": "Added",
+            "version": "v3.2.0"
+          },
+          {
+            "state": "Beta",
+            "version": "v3.2.0"
+          }
+        ],
+        "x-immich-permission": "systemMetadata.read",
+        "x-immich-state": "Beta"
+      },
+      "post": {
+        "description": "Upload signed Android release for S&AN.",
+        "operationId": "uploadApk",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "file": {
+                    "format": "binary",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "file"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApkReleaseResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "cookie": []
+          },
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "Upload signed Android release",
+        "tags": [
+          "Server"
+        ],
+        "x-immich-admin-only": true,
+        "x-immich-history": [
+          {
+            "state": "Added",
+            "version": "v3.2.0"
+          },
+          {
+            "state": "Beta",
+            "version": "v3.2.0"
+          }
+        ],
+        "x-immich-permission": "systemMetadata.update",
+        "x-immich-state": "Beta"
+      }
+    },
+    "/android-releases/download": {
+      "get": {
+        "description": "Download published Android release for S&AN.",
+        "operationId": "downloadPublishedApk",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "summary": "Download published Android release",
+        "tags": [
+          "Server"
+        ],
+        "x-immich-history": [
+          {
+            "state": "Added",
+            "version": "v3.2.0"
+          },
+          {
+            "state": "Beta",
+            "version": "v3.2.0"
+          }
+        ],
+        "x-immich-state": "Beta"
+      }
+    },
+    "/android-releases/published": {
+      "get": {
+        "description": "Get published Android release for S&AN.",
+        "operationId": "getPublishedApk",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApkPublicResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "summary": "Get published Android release",
+        "tags": [
+          "Server"
+        ],
+        "x-immich-history": [
+          {
+            "state": "Added",
+            "version": "v3.2.0"
+          },
+          {
+            "state": "Beta",
+            "version": "v3.2.0"
+          }
+        ],
+        "x-immich-state": "Beta"
+      },
+      "put": {
+        "description": "Publish or withdraw Android release for S&AN.",
+        "operationId": "publishApk",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApkPublishDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApkAdminResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "cookie": []
+          },
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "Publish or withdraw Android release",
+        "tags": [
+          "Server"
+        ],
+        "x-immich-admin-only": true,
+        "x-immich-history": [
+          {
+            "state": "Added",
+            "version": "v3.2.0"
+          },
+          {
+            "state": "Beta",
+            "version": "v3.2.0"
+          }
+        ],
+        "x-immich-permission": "systemMetadata.update",
+        "x-immich-state": "Beta"
+      }
+    },
+    "/android-releases/{id}": {
+      "delete": {
+        "description": "Remove an unpublished APK from the server.",
+        "operationId": "deleteApk",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "cookie": []
+          },
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "Remove unpublished Android release",
+        "tags": [
+          "Server"
+        ],
+        "x-immich-admin-only": true,
+        "x-immich-history": [
+          {
+            "state": "Added",
+            "version": "v3.2.0"
+          },
+          {
+            "state": "Beta",
+            "version": "v3.2.0"
+          }
+        ],
+        "x-immich-permission": "systemMetadata.update",
+        "x-immich-state": "Beta"
+      }
+    },
     "/api-keys": {
       "get": {
         "description": "Retrieve all API keys of the current user.",
@@ -20737,6 +21023,207 @@
             "type": "array"
           }
         },
+        "type": "object"
+      },
+      "ApkAdminResponseDto": {
+        "properties": {
+          "certificateSha256": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "publishedId": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "releases": {
+            "items": {
+              "properties": {
+                "certificateSha256": {
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                  "type": "string"
+                },
+                "packageName": {
+                  "type": "string"
+                },
+                "sha256": {
+                  "type": "string"
+                },
+                "size": {
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991,
+                  "type": "integer"
+                },
+                "uploadedAt": {
+                  "type": "string"
+                },
+                "uploadedBy": {
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                  "type": "string"
+                },
+                "versionCode": {
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991,
+                  "type": "integer"
+                },
+                "versionName": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "certificateSha256",
+                "id",
+                "packageName",
+                "sha256",
+                "size",
+                "uploadedAt",
+                "uploadedBy",
+                "versionCode",
+                "versionName"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "certificateSha256",
+          "publishedId",
+          "releases"
+        ],
+        "type": "object"
+      },
+      "ApkPublicResponseDto": {
+        "properties": {
+          "release": {
+            "anyOf": [
+              {
+                "properties": {
+                  "id": {
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                    "type": "string"
+                  },
+                  "packageName": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "type": "string"
+                  },
+                  "size": {
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991,
+                    "type": "integer"
+                  },
+                  "uploadedAt": {
+                    "type": "string"
+                  },
+                  "versionCode": {
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991,
+                    "type": "integer"
+                  },
+                  "versionName": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "packageName",
+                  "sha256",
+                  "size",
+                  "uploadedAt",
+                  "versionCode",
+                  "versionName"
+                ],
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "release"
+        ],
+        "type": "object"
+      },
+      "ApkPublishDto": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "ApkReleaseResponseDto": {
+        "properties": {
+          "certificateSha256": {
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "packageName": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string"
+          },
+          "size": {
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991,
+            "type": "integer"
+          },
+          "uploadedAt": {
+            "type": "string"
+          },
+          "uploadedBy": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "versionCode": {
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991,
+            "type": "integer"
+          },
+          "versionName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "certificateSha256",
+          "id",
+          "packageName",
+          "sha256",
+          "size",
+          "uploadedAt",
+          "uploadedBy",
+          "versionCode",
+          "versionName"
+        ],
         "type": "object"
       },
       "AssetBulkDeleteDto": {

@@ -381,6 +381,7 @@ export enum StorageFolder {
 export const StorageFolderSchema = z.enum(StorageFolder).describe('Storage folder').meta({ id: 'StorageFolder' });
 
 export enum SystemMetadataKey {
+  ApkReleases = 'syan-apk-releases',
   MediaLocation = 'MediaLocation',
   ReverseGeocodingState = 'reverse-geocoding-state',
   FacialRecognitionState = 'facial-recognition-state',
@@ -1022,6 +1023,7 @@ export enum VectorIndex {
 }
 
 export enum DatabaseLock {
+  ApkPublication = 1100,
   GeodataImport = 100,
   Migrations = 200,
   SystemFileMounts = 300,

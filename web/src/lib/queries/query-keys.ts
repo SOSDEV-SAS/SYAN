@@ -23,6 +23,8 @@ type PeopleParams = Parameters<typeof getAllPeople>[0];
 type MemoryParams = Parameters<typeof searchMemories>[0];
 
 export const QueryKeys = {
+  apkReleases: () => ['android-releases'],
+  publishedApk: () => [...QueryKeys.apkReleases(), 'published'],
   // activities
   activities: (...params: [ActivityParams?]) => ['activities', ...params],
   activityStatistics: (...params: [ActivityParams?]) => [...QueryKeys.activities(), 'statistics', ...params],
