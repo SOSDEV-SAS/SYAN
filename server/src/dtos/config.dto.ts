@@ -371,6 +371,9 @@ const AdminConfigSchemaWithVisibility = z
         template: z.string().describe('Template'),
       })
       .meta({ id: 'AdminConfigStorageTemplateDto' }),
+    storageTarget: z
+      .object({ primary: z.string().describe('Primary storage target') })
+      .meta({ id: 'AdminConfigStorageTargetDto' }),
     image: z
       .object({
         thumbnail: AdminConfigGeneratedImageSchema,
@@ -576,6 +579,23 @@ const StorageTemplateOptionsResponseSchema = ConfigTemplateStorageOptionSchema.o
   })
   .meta({ id: 'StorageTemplateOptionsResponseDto' });
 
+const StorageTargetResponseSchema = z
+  .object({
+    id: z.string().describe('Storage target identifier'),
+    name: z.string().describe('Storage target name'),
+    path: z.string().describe('Container storage path'),
+    primary: z.boolean().describe('Whether this target receives new files'),
+    online: z.boolean().describe('Whether this target is mounted'),
+    writable: z.boolean().describe('Whether this target is writable'),
+    total: z.int().nonnegative().describe('Total bytes'),
+    available: z.int().nonnegative().describe('Available bytes'),
+  })
+  .meta({ id: 'StorageTargetResponseDto' });
+
+const StorageTargetsResponseSchema = z
+  .object({ targets: z.array(StorageTargetResponseSchema) })
+  .meta({ id: 'StorageTargetsResponseDto' });
+
 export class AdminConfigDto extends createZodDto(AdminConfigSchema) {}
 
 export class UserConfigDto extends createZodDto(UserConfigSchema) {}
@@ -597,6 +617,10 @@ export class StorageTemplatePreviewDto extends createZodDto({
 export class StorageTemplatePreviewResponseDto extends createZodDto({
   preview: z.string().describe('Example path rendered from the template'),
 }) {}
+
+export class StorageTargetResponseDto extends createZodDto(StorageTargetResponseSchema) {}
+
+export class StorageTargetsResponseDto extends createZodDto(StorageTargetsResponseSchema) {}
 
 /** @deprecated the `/system-config` endpoints these are named after are on their way out */
 export { AdminConfigDto as SystemConfigDto, ConfigSmtpDto as SystemConfigSmtpDto };
@@ -767,6 +791,9 @@ export const defaults = Object.freeze<SystemConfig>({
     enabled: false,
     hashVerificationEnabled: true,
     template: '{{y}}/{{y}}-{{MM}}-{{dd}}/{{filename}}',
+  },
+  storageTarget: {
+    primary: 'default',
   },
   image: {
     thumbnail: {

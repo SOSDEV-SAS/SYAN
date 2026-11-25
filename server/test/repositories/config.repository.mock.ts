@@ -86,6 +86,7 @@ export const envData: EnvData = {
 
   storage: {
     ignoreMountCheckErrors: false,
+    targets: [{ id: 'default', name: 'Primary storage', path: '/data' }],
   },
 
   telemetry: {

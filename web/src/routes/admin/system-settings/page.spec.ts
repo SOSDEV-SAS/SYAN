@@ -103,6 +103,50 @@ describe('storage template previews', () => {
   });
 });
 
+describe('storage target settings', () => {
+  test('saves an available storage target', async ({ router, render, settle, api, app }) => {
+    api.on({
+      getAdminStorageTargets: () => ({
+        json: {
+          targets: [
+            {
+              id: 'default',
+              name: 'Primary storage',
+              path: '/data',
+              primary: true,
+              online: true,
+              writable: true,
+              total: 1_000_000,
+              available: 500_000,
+            },
+            {
+              id: 'windows-d',
+              name: 'Windows D storage',
+              path: '/mnt/syan-storage',
+              primary: false,
+              online: true,
+              writable: true,
+              total: 2_000_000,
+              available: 1_500_000,
+            },
+          ],
+        },
+      }),
+    });
+    await router.goto(Route.systemSettings());
+    await render(Page, load);
+    await app.admin.settings.open('admin.storage_target_settings');
+
+    await page.getByRole('combobox', { name: 'admin.storage_target_primary' }).selectOptions('windows-d');
+    await app.admin.settings.saveButton.click();
+    await settle();
+
+    expect(api.updateAdminConfig).toHaveBeenCalledWith({
+      body: expect.objectContaining({ storageTarget: { primary: 'windows-d' } }),
+    });
+  });
+});
+
 describe('storage template settings', () => {
   test.beforeEach(async ({ router, render, app }) => {
     await router.goto(Route.systemSettings());

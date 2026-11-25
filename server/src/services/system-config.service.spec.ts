@@ -199,6 +199,7 @@ const updatedConfig = Object.freeze<SystemConfig>({
     hashVerificationEnabled: true,
     template: '{{y}}/{{y}}-{{MM}}-{{dd}}/{{filename}}',
   },
+  storageTarget: { primary: 'default' },
   image: {
     thumbnail: {
       size: 360,

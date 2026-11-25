@@ -1,3 +1,6 @@
+import { join } from 'node:path';
+import { StorageCore } from 'src/cores/storage.core.js';
+import { defaults } from 'src/dtos/config.dto.js';
 import { SystemMetadataKey } from 'src/enum.js';
 import { StorageService } from 'src/services/storage.service.js';
 import { ImmichStartupError } from 'src/utils/misc.js';
@@ -25,6 +28,7 @@ describe(StorageService.name, () => {
           storage: {
             ignoreMountCheckErrors: false,
             mediaLocation: '/data',
+            targets: [{ id: 'default', name: 'Primary storage', path: '/data' }],
           },
         }),
       );
@@ -41,36 +45,21 @@ describe(StorageService.name, () => {
           upload: true,
         },
       });
-      expect(mocks.storage.mkdirSync).toHaveBeenCalledWith(expect.stringContaining('/data/encoded-video'));
-      expect(mocks.storage.mkdirSync).toHaveBeenCalledWith(expect.stringContaining('/data/library'));
-      expect(mocks.storage.mkdirSync).toHaveBeenCalledWith(expect.stringContaining('/data/profile'));
-      expect(mocks.storage.mkdirSync).toHaveBeenCalledWith(expect.stringContaining('/data/thumbs'));
-      expect(mocks.storage.mkdirSync).toHaveBeenCalledWith(expect.stringContaining('/data/upload'));
-      expect(mocks.storage.mkdirSync).toHaveBeenCalledWith(expect.stringContaining('/data/backups'));
+      expect(mocks.storage.mkdirSync).toHaveBeenCalledWith(join('/data', 'encoded-video'));
+      expect(mocks.storage.mkdirSync).toHaveBeenCalledWith(join('/data', 'library'));
+      expect(mocks.storage.mkdirSync).toHaveBeenCalledWith(join('/data', 'profile'));
+      expect(mocks.storage.mkdirSync).toHaveBeenCalledWith(join('/data', 'thumbs'));
+      expect(mocks.storage.mkdirSync).toHaveBeenCalledWith(join('/data', 'upload'));
+      expect(mocks.storage.mkdirSync).toHaveBeenCalledWith(join('/data', 'backups'));
       expect(mocks.storage.createFile).toHaveBeenCalledWith(
-        expect.stringContaining('/data/encoded-video/.immich'),
+        join('/data', 'encoded-video', '.immich'),
         expect.any(Buffer),
       );
-      expect(mocks.storage.createFile).toHaveBeenCalledWith(
-        expect.stringContaining('/data/library/.immich'),
-        expect.any(Buffer),
-      );
-      expect(mocks.storage.createFile).toHaveBeenCalledWith(
-        expect.stringContaining('/data/profile/.immich'),
-        expect.any(Buffer),
-      );
-      expect(mocks.storage.createFile).toHaveBeenCalledWith(
-        expect.stringContaining('/data/thumbs/.immich'),
-        expect.any(Buffer),
-      );
-      expect(mocks.storage.createFile).toHaveBeenCalledWith(
-        expect.stringContaining('/data/upload/.immich'),
-        expect.any(Buffer),
-      );
-      expect(mocks.storage.createFile).toHaveBeenCalledWith(
-        expect.stringContaining('/data/backups/.immich'),
-        expect.any(Buffer),
-      );
+      expect(mocks.storage.createFile).toHaveBeenCalledWith(join('/data', 'library', '.immich'), expect.any(Buffer));
+      expect(mocks.storage.createFile).toHaveBeenCalledWith(join('/data', 'profile', '.immich'), expect.any(Buffer));
+      expect(mocks.storage.createFile).toHaveBeenCalledWith(join('/data', 'thumbs', '.immich'), expect.any(Buffer));
+      expect(mocks.storage.createFile).toHaveBeenCalledWith(join('/data', 'upload', '.immich'), expect.any(Buffer));
+      expect(mocks.storage.createFile).toHaveBeenCalledWith(join('/data', 'backups', '.immich'), expect.any(Buffer));
     });
 
     it('should enable mount folder checking for a new folder type', async () => {
@@ -90,6 +79,7 @@ describe(StorageService.name, () => {
           storage: {
             ignoreMountCheckErrors: false,
             mediaLocation: '/data',
+            targets: [{ id: 'default', name: 'Primary storage', path: '/data' }],
           },
         }),
       );
@@ -107,17 +97,11 @@ describe(StorageService.name, () => {
         },
       });
       expect(mocks.storage.mkdirSync).toHaveBeenCalledTimes(2);
-      expect(mocks.storage.mkdirSync).toHaveBeenCalledWith(expect.stringContaining('/data/library'));
-      expect(mocks.storage.mkdirSync).toHaveBeenCalledWith(expect.stringContaining('/data/backups'));
+      expect(mocks.storage.mkdirSync).toHaveBeenCalledWith(join('/data', 'library'));
+      expect(mocks.storage.mkdirSync).toHaveBeenCalledWith(join('/data', 'backups'));
       expect(mocks.storage.createFile).toHaveBeenCalledTimes(2);
-      expect(mocks.storage.createFile).toHaveBeenCalledWith(
-        expect.stringContaining('/data/library/.immich'),
-        expect.any(Buffer),
-      );
-      expect(mocks.storage.createFile).toHaveBeenCalledWith(
-        expect.stringContaining('/data/backups/.immich'),
-        expect.any(Buffer),
-      );
+      expect(mocks.storage.createFile).toHaveBeenCalledWith(join('/data', 'library', '.immich'), expect.any(Buffer));
+      expect(mocks.storage.createFile).toHaveBeenCalledWith(join('/data', 'backups', '.immich'), expect.any(Buffer));
     });
 
     it('should throw an error if .immich is missing', async () => {
@@ -165,7 +149,10 @@ describe(StorageService.name, () => {
       mocks.systemMetadata.get.mockResolvedValue({ mountChecks: { upload: true } });
       mocks.config.getEnv.mockReturnValue(
         mockEnvData({
-          storage: { ignoreMountCheckErrors: true },
+          storage: {
+            ignoreMountCheckErrors: true,
+            targets: [{ id: 'default', name: 'Primary storage', path: '/data' }],
+          },
         }),
       );
       mocks.asset.getFileSamples.mockResolvedValue([]);
@@ -176,6 +163,98 @@ describe(StorageService.name, () => {
       await expect(sut.onBootstrap()).resolves.toBeUndefined();
 
       expect(mocks.systemMetadata.set).not.toHaveBeenCalledWith(SystemMetadataKey.SystemFlags, expect.anything());
+    });
+  });
+
+  describe('storage targets', () => {
+    it('reports capacity and availability for configured targets', async () => {
+      mocks.systemMetadata.get.mockResolvedValue({ storageTarget: { primary: 'archive' } });
+      mocks.config.getEnv.mockReturnValue(
+        mockEnvData({
+          storage: {
+            ignoreMountCheckErrors: false,
+            targets: [
+              { id: 'default', name: 'Default', path: '/data' },
+              { id: 'archive', name: 'Archive', path: '/mnt/archive' },
+            ],
+          },
+        }),
+      );
+      mocks.storage.checkDiskUsage.mockImplementation(async (path) =>
+        path === '/mnt/archive'
+          ? { available: 750, free: 800, total: 1000 }
+          : { available: 250, free: 300, total: 500 },
+      );
+      mocks.storage.checkFolderAccess.mockResolvedValue(true);
+
+      await expect(sut.getAdminStorageTargets()).resolves.toEqual({
+        targets: [
+          expect.objectContaining({ id: 'default', primary: false, online: true, available: 250 }),
+          expect.objectContaining({ id: 'archive', primary: true, online: true, available: 750 }),
+        ],
+      });
+    });
+
+    it('rejects a storage target that is not mounted', async () => {
+      const config = { ...defaults, storageTarget: { primary: 'archive' } };
+      mocks.config.getEnv.mockReturnValue(
+        mockEnvData({
+          storage: {
+            ignoreMountCheckErrors: false,
+            targets: [{ id: 'archive', name: 'Archive', path: '/mnt/archive' }],
+          },
+        }),
+      );
+      mocks.storage.existsSync.mockReturnValue(false);
+
+      await expect(sut.onConfigValidate({ oldConfig: defaults, newConfig: config })).rejects.toThrow(
+        'Storage target is not mounted: Archive',
+      );
+    });
+
+    it('validates a storage target without changing the active destination', async () => {
+      const config = { ...defaults, storageTarget: { primary: 'archive' } };
+      mocks.config.getEnv.mockReturnValue(
+        mockEnvData({
+          storage: {
+            ignoreMountCheckErrors: false,
+            targets: [
+              { id: 'default', name: 'Default', path: '/data' },
+              { id: 'archive', name: 'Archive', path: '/mnt/archive' },
+            ],
+          },
+        }),
+      );
+      mocks.storage.existsSync.mockReturnValue(true);
+      mocks.storage.checkFolderAccess.mockResolvedValue(true);
+      StorageCore.setMediaLocations('/data', ['/data', '/mnt/archive']);
+
+      await sut.onConfigValidate({ oldConfig: defaults, newConfig: config });
+
+      expect(StorageCore.getMediaLocation()).toBe('/data');
+    });
+
+    it('changes the destination for new files and keeps previous roots trusted', async () => {
+      const config = { ...defaults, storageTarget: { primary: 'archive' } };
+      mocks.config.getEnv.mockReturnValue(
+        mockEnvData({
+          storage: {
+            ignoreMountCheckErrors: false,
+            targets: [
+              { id: 'default', name: 'Default', path: '/data' },
+              { id: 'archive', name: 'Archive', path: '/mnt/archive' },
+            ],
+          },
+        }),
+      );
+      mocks.storage.checkFileExists.mockResolvedValue(true);
+
+      await sut.onConfigUpdate({ oldConfig: defaults, newConfig: config });
+
+      expect(StorageCore.getMediaLocation()).toBe('/mnt/archive');
+      expect(StorageCore.isImmichPath('/data/upload/file.jpg')).toBe(true);
+      expect(StorageCore.isImmichPath('/mnt/archive/upload/file.jpg')).toBe(true);
+      expect(StorageCore.isImmichPath('/etc/passwd')).toBe(false);
     });
   });
 

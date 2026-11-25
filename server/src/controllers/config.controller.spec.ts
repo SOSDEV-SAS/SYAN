@@ -5,6 +5,7 @@ import { ConfigPublicController } from 'src/controllers/config-public.controller
 import { ConfigUserController } from 'src/controllers/config-user.controller.js';
 import { defaults, mapPublicConfig, mapUserConfig } from 'src/dtos/config.dto.js';
 import { StorageTemplateService } from 'src/services/storage-template.service.js';
+import { StorageService } from 'src/services/storage.service.js';
 import { SystemConfigService } from 'src/services/system-config.service.js';
 import { errorDto } from 'test/medium/responses.js';
 import { ControllerContext, controllerSetup, mockBaseService } from 'test/utils.js';
@@ -27,6 +28,7 @@ describe('config controllers', () => {
   let ctx: ControllerContext;
   const service = mockBaseService(SystemConfigService);
   const storageTemplateService = mockBaseService(StorageTemplateService);
+  const storageService = mockBaseService(StorageService);
 
   beforeAll(async () => {
     ctx = await controllerSetup(
@@ -34,6 +36,7 @@ describe('config controllers', () => {
       [
         { provide: SystemConfigService, useValue: service },
         { provide: StorageTemplateService, useValue: storageTemplateService },
+        { provide: StorageService, useValue: storageService },
       ],
     );
     return () => ctx.close();
@@ -42,6 +45,7 @@ describe('config controllers', () => {
   beforeEach(() => {
     service.resetAllMocks();
     storageTemplateService.resetAllMocks();
+    storageService.resetAllMocks();
     ctx.reset();
   });
 
@@ -109,6 +113,31 @@ describe('config controllers', () => {
         ]),
       );
       expect(storageTemplateService.previewStorageTemplate).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('GET /admin/config/storage-targets', () => {
+    it('should return the configured storage targets', async () => {
+      storageService.getAdminStorageTargets.mockResolvedValue({
+        targets: [
+          {
+            id: 'default',
+            name: 'Primary storage',
+            path: '/data',
+            primary: true,
+            online: true,
+            writable: true,
+            total: 100,
+            available: 50,
+          },
+        ],
+      });
+
+      const { status, body } = await request(ctx.getHttpServer()).get('/admin/config/storage-targets');
+
+      expect(status).toBe(200);
+      expect(body.targets).toHaveLength(1);
+      expect(body.targets[0]).toEqual(expect.objectContaining({ id: 'default', primary: true, online: true }));
     });
   });
 

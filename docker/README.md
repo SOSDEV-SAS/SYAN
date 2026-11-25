@@ -44,8 +44,14 @@ Validation in the current Windows checkout is limited to Compose configuration r
 
 Use the production Compose together with `docker-compose.syan.yml`, through `mise //:syan:build` and `mise //:syan:up`. The overlay isolates container names, joins the existing external `proxy` network and publishes no API host port. Set `SYAN_REVISION` to the source commit, and set `IMMICH_TRUSTED_PROXIES` to the exact current Traefik address as seen on that network. Configure a stable proxy address before long-term operation.
 
-The private `docker/.env` must contain `UPLOAD_LOCATION`, `DB_USERNAME`, `DB_DATABASE_NAME`, a unique `DB_PASSWORD`, `SYAN_REVISION` and `IMMICH_TRUSTED_PROXIES`. Do not place photos or database files in this checkout. Restrict the environment file to its owner. Verify storage capacity, backups and bind mounts before starting services.
+The private `docker/.env` must contain `UPLOAD_LOCATION`, `DB_USERNAME`, `DB_DATABASE_NAME`, a unique `DB_PASSWORD`, `SYAN_REVISION`, `IMMICH_TRUSTED_PROXIES`, `SYAN_STORAGE_HOST`, `SYAN_STORAGE_USERNAME` and `SYAN_STORAGE_PASSWORD`. Do not place photos, database files or storage credentials in this checkout. Restrict the environment file to its owner. Verify storage capacity, backups and mounts before starting services.
 
 Public routing defaults to disabled (`SYAN_PUBLIC_ENABLED=false`), and initial account setup is disabled. Bootstrap the administrator only through a temporary local-only override enabling setup and binding `127.0.0.1:2283`, reached through an SSH tunnel. Remove that override after creating the administrator, confirm setup is disabled, then set `SYAN_PUBLIC_ENABLED=true` and rerun the up task. This prevents exposing unauthenticated first-admin registration to the Internet.
 
-Before enabling routing, verify all container health checks, administrator authentication, an upload/download round trip and restored backup. Then verify HTTPS and login through the actual domain. APK distribution and managed removable disks remain unavailable in this version.
+Before enabling routing, verify all container health checks, administrator authentication, an upload/download round trip and restored backup. Then verify HTTPS and login through the actual domain.
+
+### Windows D storage
+
+Run `scripts/syan-storage-windows.ps1` from an elevated PowerShell session and pass only the server's Tailscale IPv4 address through `-ServerTailscaleAddress`. The script creates separate encrypted SMB shares for writable media and read-only external libraries, a dedicated local service account with a random password, and a firewall rule restricted to that Tailscale peer. It stores the generated credential under the current Windows profile, outside this repository.
+
+Install `cifs-utils` on the Linux host, copy the generated host, username and password into the private `docker/.env`, then run the S&AN deployment tasks. The server receives the writable share at `/mnt/syan-storage` and the read-only library share at `/mnt/syan-library`. Configure external libraries with paths below `/mnt/syan-library`; never mount the PostgreSQL data directory on SMB.

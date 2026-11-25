@@ -13,6 +13,44 @@ enum DatabaseSslMode {
 
 const DatabaseSslModeSchema = z.enum(DatabaseSslMode).describe('Database SSL mode').meta({ id: 'DatabaseSslMode' });
 const absolutePath = z.string().regex(/^\//, 'Must be an absolute path').optional();
+const storageTargets = z
+  .string()
+  .optional()
+  .transform((value, ctx) => {
+    if (!value) {
+      return undefined;
+    }
+
+    try {
+      return z
+        .array(
+          z.object({
+            id: z.string().regex(/^[a-z0-9][a-z0-9-]{0,31}$/),
+            name: z.string().min(1).max(64),
+            path: z.string().regex(/^\//, 'Must be an absolute path'),
+          }),
+        )
+        .min(1)
+        .superRefine((targets, targetsContext) => {
+          const ids = new Set<string>();
+          const paths = new Set<string>();
+          for (const target of targets) {
+            if (ids.has(target.id)) {
+              targetsContext.addIssue({ code: 'custom', message: `Duplicate storage target id: ${target.id}` });
+            }
+            if (paths.has(target.path)) {
+              targetsContext.addIssue({ code: 'custom', message: `Duplicate storage target path: ${target.path}` });
+            }
+            ids.add(target.id);
+            paths.add(target.path);
+          }
+        })
+        .parse(JSON.parse(value));
+    } catch (error) {
+      ctx.addIssue({ code: 'custom', message: error instanceof Error ? error.message : 'Invalid storage targets' });
+      return z.NEVER;
+    }
+  });
 /**
 Treat certain strings as booleans and coerce them to boolean
 Ideal for environment variables that are strings but should be treated as booleans
@@ -50,6 +88,7 @@ export const EnvSchema = z
     IMMICH_LOG_LEVEL: LogLevelSchema.optional(),
     IMMICH_LOG_FORMAT: LogFormatSchema.optional(),
     IMMICH_MEDIA_LOCATION: absolutePath,
+    SYAN_STORAGE_TARGETS: storageTargets,
     IMMICH_MICROSERVICES_METRICS_PORT: z.coerce.number().int().optional(),
     IMMICH_ALLOW_EXTERNAL_PLUGINS: stringBool.optional(),
     IMMICH_PLUGINS_INSTALL_FOLDER: absolutePath,

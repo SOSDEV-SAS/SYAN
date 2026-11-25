@@ -9,6 +9,7 @@ import {
   getRecentAlbumsQuery,
 } from '#lib/queries/album.query.ts';
 import { getApiKeysQuery } from '#lib/queries/api-key.query.ts';
+import { getApkReleasesQuery, getPublishedApkQuery } from '#lib/queries/apk.query.ts';
 import { getAssetStatisticsQuery } from '#lib/queries/asset.query.ts';
 import { getAuthStatusQuery } from '#lib/queries/auth.query.ts';
 import {
@@ -19,6 +20,7 @@ import {
 import {
   getAdminConfigDefaultsQuery,
   getAdminConfigQuery,
+  getStorageTargetsQuery,
   getStorageTemplateOptionsQuery,
   getStorageTemplatePreviewQuery,
 } from '#lib/queries/config-admin.query.ts';
@@ -128,6 +130,8 @@ const queries: Record<string, QueryFactory> = {
   getAlbumInfoQuery: () => getAlbumInfoQuery(id),
   getAlbumMapMarkersQuery: () => getAlbumMapMarkersQuery(id),
   getApiKeysQuery: () => getApiKeysQuery(),
+  getApkReleasesQuery: () => getApkReleasesQuery(),
+  getPublishedApkQuery: () => getPublishedApkQuery(),
   searchMemoriesQuery: () => searchMemoriesQuery({ isSaved: true }),
   memoriesStatisticsQuery: () => memoriesStatisticsQuery({ isSaved: true }),
   getAssetStatisticsQuery: () => getAssetStatisticsQuery({ isFavorite: true }),
@@ -139,6 +143,7 @@ const queries: Record<string, QueryFactory> = {
   getAdminConfigDefaultsQuery: () => getAdminConfigDefaultsQuery(),
   getStorageTemplateOptionsQuery: () => getStorageTemplateOptionsQuery(),
   getStorageTemplatePreviewQuery: () => getStorageTemplatePreviewQuery('{{y}}/{{filename}}'),
+  getStorageTargetsQuery: () => getStorageTargetsQuery(),
   getPublicConfigQuery: () => getPublicConfigQuery(),
   getUserConfigQuery: () => getUserConfigQuery(),
   getDatabaseBackupsQuery: () => getDatabaseBackupsQuery(),

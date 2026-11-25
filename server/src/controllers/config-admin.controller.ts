@@ -3,6 +3,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { Endpoint, HistoryBuilder } from 'src/decorators.js';
 import {
   AdminConfigDto,
+  StorageTargetsResponseDto,
   StorageTemplateOptionsResponseDto,
   StorageTemplatePreviewDto,
   StorageTemplatePreviewResponseDto,
@@ -10,6 +11,7 @@ import {
 import { ApiTag, Permission } from 'src/enum.js';
 import { Authenticated } from 'src/middleware/auth.guard.js';
 import { StorageTemplateService } from 'src/services/storage-template.service.js';
+import { StorageService } from 'src/services/storage.service.js';
 import { SystemConfigService } from 'src/services/system-config.service.js';
 
 @ApiTags(ApiTag.ConfigAdmin)
@@ -18,6 +20,7 @@ export class ConfigAdminController {
   constructor(
     private service: SystemConfigService,
     private storageTemplateService: StorageTemplateService,
+    private storageService: StorageService,
   ) {}
 
   @Get()
@@ -62,6 +65,17 @@ export class ConfigAdminController {
   })
   getAdminStorageTemplateOptions(): StorageTemplateOptionsResponseDto {
     return this.storageTemplateService.getAdminStorageTemplateOptions();
+  }
+
+  @Get('storage-targets')
+  @Authenticated({ permission: Permission.AdminConfigRead, admin: true })
+  @Endpoint({
+    summary: 'Get storage targets',
+    description: 'Retrieve the server-approved storage targets and their current capacity and availability.',
+    history: HistoryBuilder.v4().alpha('v4.0.0'),
+  })
+  getAdminStorageTargets(): Promise<StorageTargetsResponseDto> {
+    return this.storageService.getAdminStorageTargets();
   }
 
   @Post('storage-template/preview')

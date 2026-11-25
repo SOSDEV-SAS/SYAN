@@ -115,6 +115,7 @@ export interface EnvData {
   storage: {
     ignoreMountCheckErrors: boolean;
     mediaLocation?: string;
+    targets: Array<{ id: string; name: string; path: string }>;
   };
 
   workers: ImmichWorker[];
@@ -380,6 +381,9 @@ const getEnv = (): EnvData => {
     storage: {
       ignoreMountCheckErrors: !!dto.IMMICH_IGNORE_MOUNT_CHECK_ERRORS,
       mediaLocation: dto.IMMICH_MEDIA_LOCATION,
+      targets: dto.SYAN_STORAGE_TARGETS ?? [
+        { id: 'default', name: 'Primary storage', path: dto.IMMICH_MEDIA_LOCATION ?? '/data' },
+      ],
     },
 
     telemetry: {

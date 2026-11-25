@@ -1,4 +1,4 @@
-import { dirname, extname, join, resolve } from 'node:path';
+import { dirname, extname, join, resolve, sep } from 'node:path';
 import { StorageAsset } from 'src/database.js';
 import {
   AssetFileType,
@@ -48,6 +48,7 @@ export type ImagePathOptions = { fileType: AssetFileType; format: ImageFormat | 
 let instance: StorageCore | null;
 
 let mediaLocation: string | undefined;
+let mediaLocations: string[] = [];
 
 export class StorageCore {
   private constructor(
@@ -103,6 +104,12 @@ export class StorageCore {
 
   static setMediaLocation(location: string) {
     mediaLocation = location;
+    mediaLocations = [location];
+  }
+
+  static setMediaLocations(location: string, locations: string[]) {
+    mediaLocation = location;
+    mediaLocations = [...new Set(locations)];
   }
 
   static getFolderLocation(folder: StorageFolder, userId: string) {
@@ -151,12 +158,12 @@ export class StorageCore {
 
   static isImmichPath(path: string) {
     const resolvedPath = resolve(path);
-    const resolvedAppMediaLocation = StorageCore.getMediaLocation();
-    const normalizedPath = resolvedPath.endsWith('/') ? resolvedPath : resolvedPath + '/';
-    const normalizedAppMediaLocation = resolvedAppMediaLocation.endsWith('/')
-      ? resolvedAppMediaLocation
-      : resolvedAppMediaLocation + '/';
-    return normalizedPath.startsWith(normalizedAppMediaLocation);
+    const normalizedPath = resolvedPath.endsWith(sep) ? resolvedPath : resolvedPath + sep;
+    return mediaLocations.some((location) => {
+      const resolvedLocation = resolve(location);
+      const normalizedLocation = resolvedLocation.endsWith(sep) ? resolvedLocation : resolvedLocation + sep;
+      return normalizedPath.startsWith(normalizedLocation);
+    });
   }
 
   async moveAssetImage(asset: StorageAsset, fileType: AssetFileType, format: ImageFormat) {

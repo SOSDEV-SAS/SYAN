@@ -1,4 +1,5 @@
 <script lang="ts">
+  import StorageTargetSettings from '#lib/components/admin-settings/StorageTargetSettings.svelte';
   import StorageTemplateSettings from '#lib/components/admin-settings/StorageTemplateSettings.svelte';
   import AdminPageLayout from '#lib/components/layouts/AdminPageLayout.svelte';
   import SettingAccordion from '#lib/components/shared-components/settings/SettingAccordion.svelte';
@@ -18,6 +19,7 @@
     mdiFileCheckOutline,
     mdiFileDocumentOutline,
     mdiFolderOutline,
+    mdiHarddisk,
     mdiImageOutline,
     mdiLockOutline,
     mdiMapMarkerOutline,
@@ -157,6 +159,13 @@
       subtitle: $t('admin.server_settings_description'),
       key: 'server',
       icon: mdiServerOutline,
+    },
+    {
+      component: StorageTargetSettings,
+      title: $t('admin.storage_target_settings'),
+      subtitle: $t('admin.storage_target_settings_description'),
+      key: 'storage-target',
+      icon: mdiHarddisk,
     },
     {
       component: StorageTemplateSettings,

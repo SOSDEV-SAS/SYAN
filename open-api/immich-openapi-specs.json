@@ -482,6 +482,53 @@
         "x-immich-state": "Alpha"
       }
     },
+    "/admin/config/storage-targets": {
+      "get": {
+        "description": "Retrieve the server-approved storage targets and their current capacity and availability.",
+        "operationId": "getAdminStorageTargets",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorageTargetsResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "cookie": []
+          },
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "Get storage targets",
+        "tags": [
+          "Config (admin)"
+        ],
+        "x-immich-admin-only": true,
+        "x-immich-history": [
+          {
+            "state": "Added",
+            "version": "v4.0.0"
+          },
+          {
+            "state": "Alpha",
+            "version": "v4.0.0"
+          }
+        ],
+        "x-immich-permission": "adminConfig.read",
+        "x-immich-state": "Alpha"
+      }
+    },
     "/admin/config/storage-template": {
       "get": {
         "description": "Retrieve the storage template variables and the preset templates, each with an example path.",
@@ -19454,6 +19501,9 @@
           "server": {
             "$ref": "#/components/schemas/AdminConfigServerDto"
           },
+          "storageTarget": {
+            "$ref": "#/components/schemas/AdminConfigStorageTargetDto"
+          },
           "storageTemplate": {
             "$ref": "#/components/schemas/AdminConfigStorageTemplateDto"
           },
@@ -19489,6 +19539,7 @@
           "passwordLogin",
           "reverseGeocoding",
           "server",
+          "storageTarget",
           "storageTemplate",
           "templates",
           "theme",
@@ -20496,6 +20547,18 @@
           "port",
           "secure",
           "username"
+        ],
+        "type": "object"
+      },
+      "AdminConfigStorageTargetDto": {
+        "properties": {
+          "primary": {
+            "description": "Primary storage target",
+            "type": "string"
+          }
+        },
+        "required": [
+          "primary"
         ],
         "type": "object"
       },
@@ -31761,6 +31824,71 @@
           "backups"
         ],
         "type": "string"
+      },
+      "StorageTargetResponseDto": {
+        "properties": {
+          "available": {
+            "description": "Available bytes",
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "id": {
+            "description": "Storage target identifier",
+            "type": "string"
+          },
+          "name": {
+            "description": "Storage target name",
+            "type": "string"
+          },
+          "online": {
+            "description": "Whether this target is mounted",
+            "type": "boolean"
+          },
+          "path": {
+            "description": "Container storage path",
+            "type": "string"
+          },
+          "primary": {
+            "description": "Whether this target receives new files",
+            "type": "boolean"
+          },
+          "total": {
+            "description": "Total bytes",
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "writable": {
+            "description": "Whether this target is writable",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "available",
+          "id",
+          "name",
+          "online",
+          "path",
+          "primary",
+          "total",
+          "writable"
+        ],
+        "type": "object"
+      },
+      "StorageTargetsResponseDto": {
+        "properties": {
+          "targets": {
+            "items": {
+              "$ref": "#/components/schemas/StorageTargetResponseDto"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "targets"
+        ],
+        "type": "object"
       },
       "StorageTemplateOptionsResponseDto": {
         "properties": {

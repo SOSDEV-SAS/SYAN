@@ -7,11 +7,15 @@ services:
     ports: !reset []
     volumes:
       - syan-apks:/var/lib/syan/apks
+      - syan-windows-storage:/mnt/syan-storage
+      - syan-windows-library:/mnt/syan-library:ro
     networks:
       - default
       - proxy
     environment:
       IMMICH_ALLOW_SETUP: 'false'
+      SYAN_STORAGE_TARGETS: >-
+        [{"id":"default","name":"Server storage","path":"/data"},{"id":"windows-d","name":"Windows D storage","path":"/mnt/syan-storage"}]
     healthcheck:
       test:
         - CMD
@@ -50,3 +54,17 @@ networks:
 
 volumes:
   syan-apks:
+  syan-windows-storage:
+    driver: local
+    driver_opts:
+      type: cifs
+      o: >-
+        addr=${SYAN_STORAGE_HOST:?Set the private Tailscale storage host},username=${SYAN_STORAGE_USERNAME:?Set the storage user},password=${SYAN_STORAGE_PASSWORD:?Set the storage password},vers=3.1.1,seal,uid=1000,gid=1000,file_mode=0660,dir_mode=0770,noserverino
+      device: //${SYAN_STORAGE_HOST}/SYAN_STORAGE
+  syan-windows-library:
+    driver: local
+    driver_opts:
+      type: cifs
+      o: >-
+        addr=${SYAN_STORAGE_HOST:?Set the private Tailscale storage host},username=${SYAN_STORAGE_USERNAME:?Set the storage user},password=${SYAN_STORAGE_PASSWORD:?Set the storage password},vers=3.1.1,seal,uid=1000,gid=1000,file_mode=0440,dir_mode=0550,noserverino,ro
+      device: //${SYAN_STORAGE_HOST}/SYAN_LIBRARY

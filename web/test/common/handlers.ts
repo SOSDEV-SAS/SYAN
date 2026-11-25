@@ -29,6 +29,22 @@ export const createHandlers = (data: MockData): Handlers => {
     getAdminConfigDefaults: () => ({ json: data.adminConfig }),
     updateAdminConfig: ({ body }) => ({ json: data.updateAdminConfig(body) }),
     getAdminStorageTemplateOptions: () => ({ json: data.storageTemplateOptions }),
+    getAdminStorageTargets: () => ({
+      json: {
+        targets: [
+          {
+            id: 'default',
+            name: 'Primary storage',
+            path: '/data',
+            primary: true,
+            online: true,
+            writable: true,
+            total: 1_000_000,
+            available: 500_000,
+          },
+        ],
+      },
+    }),
     previewStorageTemplate: ({ body }) => ({ json: { preview: data.previewStorageTemplate(body.template) } }),
     sendTestEmailAdmin: () => ({ json: { messageId: 'test-message-id' } }),
     getServerFeatures: () => ({ json: data.serverFeatures }),

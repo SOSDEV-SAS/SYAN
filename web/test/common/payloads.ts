@@ -266,6 +266,7 @@ const adminConfig = (overrides: Partial<ResponseOf<'getAdminConfig'>> = {}): Res
     hashVerificationEnabled: true,
     template: '{{y}}/{{y}}-{{MM}}-{{dd}}/{{filename}}',
   },
+  storageTarget: { primary: 'default' },
   image: {
     thumbnail: { format: ImageFormat.Webp, size: 250, quality: 80, progressive: false, effort: ImageEffort.Medium },
     preview: { format: ImageFormat.Jpeg, size: 1440, quality: 80, progressive: false, effort: ImageEffort.Medium },

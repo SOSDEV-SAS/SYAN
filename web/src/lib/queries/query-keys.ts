@@ -34,6 +34,7 @@ export const QueryKeys = {
   adminConfigDefaults: () => [...QueryKeys.adminConfig(), 'defaults'],
   storageTemplate: () => [...QueryKeys.adminConfig(), 'storage-template'],
   storageTemplatePreview: (params: { template: string }) => [...QueryKeys.storageTemplate(), 'preview', params],
+  storageTargets: () => [...QueryKeys.adminConfig(), 'storage-targets'],
 
   // backups
   databaseBackups: () => ['admin', 'database-backups'],

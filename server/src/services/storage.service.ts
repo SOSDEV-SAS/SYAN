@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import { ErrorMessages } from 'src/constants.js';
 import { StorageCore } from 'src/cores/storage.core.js';
 import { OnEvent, OnJob } from 'src/decorators.js';
+import { StorageTargetsResponseDto, type SystemConfig } from 'src/dtos/config.dto.js';
 import {
   BootstrapEventPriority,
   DatabaseLock,
@@ -12,23 +13,47 @@ import {
   StorageFolder,
   SystemMetadataKey,
 } from 'src/enum.js';
+import type { ArgOf } from 'src/repositories/event.repository.js';
 import { BaseService } from 'src/services/base.service.js';
 import type { JobOf, SystemFlags } from 'src/types.js';
 import { ImmichStartupError } from 'src/utils/misc.js';
-import { detectMediaLocation } from 'src/utils/storage.js';
 
 const docsMessage = `Please see https://docs.immich.app/administration/system-integrity#folder-checks for more information.`;
 
 @Injectable()
 export class StorageService extends BaseService {
-  private detectMediaLocation(): string {
-    const envData = this.configRepository.getEnv();
-    return detectMediaLocation(envData.storage.mediaLocation, (path) => this.storageRepository.existsSync(path));
+  private getStorageTarget(config: SystemConfig) {
+    const { storage } = this.configRepository.getEnv();
+    const target = storage.targets.find(({ id }) => id === config.storageTarget.primary);
+    if (!target) {
+      throw new Error(`Storage target is not configured: ${config.storageTarget.primary}`);
+    }
+    return target;
+  }
+
+  private async validateStorageTarget(config: SystemConfig) {
+    const target = this.getStorageTarget(config);
+    if (!this.storageRepository.existsSync(target.path)) {
+      throw new Error(`Storage target is not mounted: ${target.name}`);
+    }
+    if (!(await this.storageRepository.checkFolderAccess(target.path))) {
+      throw new Error(`Storage target is not writable: ${target.name}`);
+    }
+  }
+
+  private activateStorageTarget(config: SystemConfig) {
+    const { storage } = this.configRepository.getEnv();
+    const target = this.getStorageTarget(config);
+    StorageCore.setMediaLocations(
+      target.path,
+      storage.targets.map(({ path }) => path),
+    );
   }
 
   @OnEvent({ name: 'AppBootstrap', priority: BootstrapEventPriority.StorageService })
   async onBootstrap() {
-    StorageCore.setMediaLocation(this.detectMediaLocation());
+    const config = await this.getConfig({ withCache: false });
+    this.activateStorageTarget(config);
 
     await this.databaseRepository.withLock(DatabaseLock.SystemFileMounts, async () => {
       const flags =
@@ -81,6 +106,7 @@ export class StorageService extends BaseService {
 
     await this.databaseRepository.withLock(DatabaseLock.MediaLocation, async () => {
       const current = StorageCore.getMediaLocation();
+      const { targets } = this.configRepository.getEnv().storage;
       const samples = await this.assetRepository.getFileSamples();
       const savedValue = await this.systemMetadataRepository.get(SystemMetadataKey.MediaLocation);
       if (samples.length > 0) {
@@ -96,7 +122,7 @@ export class StorageService extends BaseService {
           previous = path.startsWith('upload/') ? 'upload' : '/usr/src/app/upload';
         }
 
-        if (previous !== current) {
+        if (previous !== current && targets.length === 1) {
           this.logger.log(`Media location changed (from=${previous}, to=${current})`);
 
           if (!path.startsWith(previous)) {
@@ -115,6 +141,59 @@ export class StorageService extends BaseService {
         await this.systemMetadataRepository.set(SystemMetadataKey.MediaLocation, { location: current });
       }
     });
+  }
+
+  @OnEvent({ name: 'ConfigValidate' })
+  async onConfigValidate({ newConfig }: ArgOf<'ConfigValidate'>) {
+    await this.validateStorageTarget(newConfig);
+  }
+
+  @OnEvent({ name: 'ConfigUpdate', server: true })
+  async onConfigUpdate({ oldConfig, newConfig }: ArgOf<'ConfigUpdate'>) {
+    if (oldConfig.storageTarget.primary === newConfig.storageTarget.primary) {
+      return;
+    }
+
+    this.activateStorageTarget(newConfig);
+    for (const folder of Object.values(StorageFolder)) {
+      const { internalPath } = this.getMountFilePaths(folder);
+      if (!(await this.storageRepository.checkFileExists(internalPath))) {
+        await this.createMountFile(folder);
+      }
+      await this.verifyReadAccess(folder);
+      await this.verifyWriteAccess(folder);
+    }
+  }
+
+  async getAdminStorageTargets(): Promise<StorageTargetsResponseDto> {
+    const config = await this.getConfig({ withCache: false });
+    const { targets } = this.configRepository.getEnv().storage;
+    return {
+      targets: await Promise.all(
+        targets.map(async (target) => {
+          try {
+            const usage = await this.storageRepository.checkDiskUsage(target.path);
+            return {
+              ...target,
+              primary: target.id === config.storageTarget.primary,
+              online: true,
+              writable: await this.storageRepository.checkFolderAccess(target.path),
+              total: usage.total,
+              available: usage.available,
+            };
+          } catch {
+            return {
+              ...target,
+              primary: target.id === config.storageTarget.primary,
+              online: false,
+              writable: false,
+              total: 0,
+              available: 0,
+            };
+          }
+        }),
+      ),
+    };
   }
 
   @OnJob({ name: JobName.FileDelete, queue: QueueName.BackgroundTask })

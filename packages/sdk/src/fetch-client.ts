@@ -385,6 +385,10 @@ export type AdminConfigServerDto = {
     /** Public users */
     publicUsers: boolean;
 };
+export type AdminConfigStorageTargetDto = {
+    /** Primary storage target */
+    primary: string;
+};
 export type AdminConfigStorageTemplateDto = {
     /** Enabled */
     enabled: boolean;
@@ -437,11 +441,33 @@ export type AdminConfigDto = {
     passwordLogin: AdminConfigPasswordLoginDto;
     reverseGeocoding: AdminConfigReverseGeocodingDto;
     server: AdminConfigServerDto;
+    storageTarget: AdminConfigStorageTargetDto;
     storageTemplate: AdminConfigStorageTemplateDto;
     templates: AdminConfigTemplatesDto;
     theme: AdminConfigThemeDto;
     trash: AdminConfigTrashDto;
     user: AdminConfigUserDto;
+};
+export type StorageTargetResponseDto = {
+    /** Available bytes */
+    available: number;
+    /** Storage target identifier */
+    id: string;
+    /** Storage target name */
+    name: string;
+    /** Whether this target is mounted */
+    online: boolean;
+    /** Container storage path */
+    path: string;
+    /** Whether this target receives new files */
+    primary: boolean;
+    /** Total bytes */
+    total: number;
+    /** Whether this target is writable */
+    writable: boolean;
+};
+export type StorageTargetsResponseDto = {
+    targets: StorageTargetResponseDto[];
 };
 export type StorageTemplatePresetDto = {
     /** Example path rendered from the preset */
@@ -4131,6 +4157,17 @@ export function getAdminConfigDefaults(opts?: Oazapfts.RequestOpts) {
         status: 200;
         data: AdminConfigDto;
     }>("/admin/config/defaults", {
+        ...opts
+    }));
+}
+/**
+ * Get storage targets
+ */
+export function getAdminStorageTargets(opts?: Oazapfts.RequestOpts) {
+    return oazapfts.ok(oazapfts.fetchJson<{
+        status: 200;
+        data: StorageTargetsResponseDto;
+    }>("/admin/config/storage-targets", {
         ...opts
     }));
 }

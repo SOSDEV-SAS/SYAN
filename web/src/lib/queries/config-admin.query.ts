@@ -4,6 +4,7 @@ import { QueryKeys } from '#lib/queries/query-keys.ts';
 import {
   getAdminConfig,
   getAdminConfigDefaults,
+  getAdminStorageTargets,
   getAdminStorageTemplateOptions,
   previewStorageTemplate,
   updateAdminConfig,
@@ -35,6 +36,12 @@ export const getStorageTemplatePreviewQuery = (template: string) =>
   queryOptions({
     queryKey: QueryKeys.storageTemplatePreview({ template }),
     queryFn: ({ signal }) => previewStorageTemplate({ storageTemplatePreviewDto: { template } }, { signal }),
+  });
+
+export const getStorageTargetsQuery = () =>
+  queryOptions({
+    queryKey: QueryKeys.storageTargets(),
+    queryFn: ({ signal }) => getAdminStorageTargets({ signal }),
   });
 
 export const updateAdminConfigMutation = () =>

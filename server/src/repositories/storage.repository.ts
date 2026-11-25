@@ -198,6 +198,15 @@ export class StorageRepository {
     }
   }
 
+  async checkFolderAccess(filepath: string): Promise<boolean> {
+    try {
+      await fs.access(filepath, constants.R_OK | constants.W_OK);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   async unlink(file: string) {
     try {
       await fs.unlink(file);
