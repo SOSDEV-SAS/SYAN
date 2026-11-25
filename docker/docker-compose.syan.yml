@@ -24,6 +24,9 @@ services:
       traefik.docker.network: proxy
       traefik.http.routers.syan.rule: Host(`syan.sosdev.com.co`)
       traefik.http.routers.syan.entrypoints: web
+      traefik.http.routers.syan.middlewares: syan-https
+      traefik.http.middlewares.syan-https.redirectscheme.scheme: https
+      traefik.http.middlewares.syan-https.redirectscheme.permanent: 'true'
       traefik.http.services.syan.loadbalancer.server.port: '2283'
 
   immich-machine-learning:
