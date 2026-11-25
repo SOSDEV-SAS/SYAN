@@ -208,3 +208,5 @@ run = "pnpm exec prettier --write {{arg(name='files', var=true)}}"
 run = "docker build --progress=plain -f server/Dockerfile -t syan-server:{{env.SYAN_REVISION}} ."
 [tasks."syan:ml-image"]
 run = "docker build --progress=plain -f machine-learning/Dockerfile -t syan-machine-learning:{{env.SYAN_REVISION}} machine-learning"
+[tasks."syan:verify"]
+run = "docker exec -i syan_server node /tmp/syan-verify.mjs"
