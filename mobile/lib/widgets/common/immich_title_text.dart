@@ -8,11 +8,9 @@ class ImmichTitleText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Image(
-      image: AssetImage(context.isDarkTheme ? 'assets/immich-text-dark.png' : 'assets/immich-text-light.png'),
-      width: fontSize * 4,
-      filterQuality: FilterQuality.high,
-      color: context.primaryColor,
+    return Text(
+      'S&AN',
+      style: TextStyle(color: context.primaryColor, fontSize: fontSize, fontWeight: FontWeight.w700, letterSpacing: -1),
     );
   }
 }

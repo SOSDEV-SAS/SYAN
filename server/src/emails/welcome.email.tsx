@@ -40,7 +40,7 @@ export const WelcomeEmail = ({ baseUrl, displayName, username, password, customT
       preview={
         customTemplate
           ? templatePreview(customTemplate, usableTemplateVariables)
-          : 'You have been invited to a new Immich instance.'
+          : 'You have been invited to a new S&AN instance.'
       }
     >
       {customTemplate && (
@@ -65,9 +65,9 @@ export const WelcomeEmail = ({ baseUrl, displayName, username, password, customT
 };
 
 WelcomeEmail.PreviewProps = {
-  baseUrl: 'https://demo.immich.app/auth/login',
+  baseUrl: 'https://syan.example.com/auth/login',
   displayName: 'Alan Turing',
-  username: 'alanturing@immich.app',
+  username: 'alanturing@syan.example.com',
   password: 'mysuperpassword',
 } as WelcomeEmailProps;
 

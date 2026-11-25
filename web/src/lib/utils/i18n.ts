@@ -23,6 +23,21 @@ const aliases: Record<string, string> = {
 
 const modules = import.meta.glob('#i18n/*.json');
 
+const brandTranslationValue = (value: unknown): unknown => {
+  if (typeof value === 'string') {
+    return value.replaceAll('Immich', 'S&AN');
+  }
+  if (Array.isArray(value)) {
+    return value.map(brandTranslationValue);
+  }
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, brandTranslationValue(item)]));
+  }
+  return value;
+};
+
+const brandTranslations = (translations: object): object => brandTranslationValue(translations) as object;
+
 const fileCodes = Object.keys(modules)
   .map((path) => path.match(/\/(\w+)\.json$/)?.[1])
   .filter(Boolean) as string[];
@@ -137,7 +152,10 @@ export const langs: Lang[] = [
     .map((code) => ({
       name: getLanguageName(convertBCP47(code)),
       code,
-      loader: () => import(`#i18n/${code}.json`),
+      loader: async () => {
+        const translations = await import(`#i18n/${code}.json`);
+        return { default: brandTranslations(translations.default) };
+      },
       rtl: rtlCodes.has(code),
     }))
     .sort((a, b) => a.code.localeCompare(b.code)),

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Body, Container, Font, Head, Hr, Html, Img, Preview, Section, Tailwind, Text } from 'react-email';
+import { Body, Container, Head, Hr, Html, Preview, Section, Tailwind, Text } from 'react-email';
 // @ts-expect-error
 import tailwindPresetEmail from 'tailwindcss-preset-email';
 import { ImmichFooter } from 'src/emails/components/footer.template.js';
@@ -18,7 +18,7 @@ export const ImmichLayout = ({ children, preview }: ImmichLayoutProps) => (
           extend: {
             colors: {
               // Light Theme
-              'immich-primary': '#4250AF',
+              'immich-primary': '#00aeb5',
               'immich-bg': 'white',
               'immich-fg': 'black',
               'immich-gray': '#F6F6F4',
@@ -32,28 +32,13 @@ export const ImmichLayout = ({ children, preview }: ImmichLayoutProps) => (
         },
       }}
     >
-      <Head>
-        <Font
-          fontFamily="Overpass"
-          fallbackFontFamily="sans-serif"
-          webFont={{
-            url: 'https://fonts.gstatic.com/s/overpass/v13/qFdH35WCmI96Ajtm81GrU9vyww.woff2',
-            format: 'woff2',
-          }}
-          fontWeight={'100 900'}
-          fontStyle="normal"
-        />
-      </Head>
+      <Head />
       <Preview>{preview}</Preview>
       <Body className="bg-[#F4F4f4] my-auto mx-auto px-2 font-sans text-base text-gray-800">
         <Container className="my-[40px] mx-auto max-w-[465px]">
           <Section className="my-6 p-12 border border-red-400 rounded-[50px] bg-gray-50">
             <Section className="flex justify-center mb-12">
-              <Img
-                src="https://immich.app/img/immich-logo-inline-light.png"
-                className="h-12 antialiased rounded-none w-full"
-                alt="Immich"
-              />
+              <Text className="m-0 text-4xl font-bold text-immich-primary">S&amp;AN</Text>
             </Section>
 
             {children}

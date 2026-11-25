@@ -17,7 +17,6 @@ import 'package:immich_mobile/constants/locales.dart';
 import 'package:immich_mobile/data/store.dart';
 import 'package:immich_mobile/domain/services/background_worker.service.dart';
 import 'package:immich_mobile/extensions/build_context_extensions.dart';
-import 'package:immich_mobile/generated/codegen_loader.g.dart';
 import 'package:immich_mobile/generated/translations.g.dart';
 import 'package:immich_mobile/infrastructure/repositories/network.repository.dart';
 import 'package:immich_mobile/pages/common/splash_screen.page.dart';
@@ -44,6 +43,7 @@ import 'package:immich_mobile/utils/debug_print.dart';
 import 'package:immich_mobile/utils/fallback_localizations.dart';
 import 'package:immich_mobile/utils/licenses.dart';
 import 'package:immich_mobile/utils/migration.dart';
+import 'package:immich_mobile/utils/syan_localization_loader.dart';
 import 'package:immich_mobile/wm_executor.dart';
 import 'package:immich_ui/immich_ui.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -284,7 +284,7 @@ class ImmichAppState extends ConsumerState<ImmichApp> with WidgetsBindingObserve
     return ProviderScope(
       overrides: [localeProvider.overrideWithValue(context.locale)],
       child: MaterialApp.router(
-        title: 'Immich',
+        title: 'S&AN',
         debugShowCheckedModeBanner: true,
         scaffoldMessengerKey: scaffoldMessengerKey,
         localizationsDelegates: [...context.localizationDelegates, ...fallbackLocalizationDelegates],
@@ -320,7 +320,7 @@ class MainWidget extends StatelessWidget {
       path: translationsPath,
       useFallbackTranslations: true,
       fallbackLocale: locales.values.first,
-      assetLoader: const CodegenLoader(),
+      assetLoader: const SyanLocalizationLoader(),
       child: const ImmichApp(),
     );
   }

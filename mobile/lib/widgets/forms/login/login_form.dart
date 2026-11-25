@@ -203,9 +203,9 @@ class LoginForm extends HookConsumerWidget {
     }, []);
 
     void populateTestLoginInfo() {
-      emailController.text = 'demo@immich.app';
+      emailController.text = 'demo@syan.example.com';
       passwordController.text = 'demo';
-      serverEndpointController.text = 'https://demo.immich.app';
+      serverEndpointController.text = 'https://syan.sosdev.com.co';
     }
 
     void populateTestLoginInfo1() {

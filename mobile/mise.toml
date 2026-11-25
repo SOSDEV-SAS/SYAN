@@ -98,7 +98,7 @@ run = [
 alias = "pigeon"
 description = "Generate pigeon platform code"
 run = [
-  "ls pigeon/*.dart | xargs -n1 -P4 -I{} dart run pigeon --input {}",
+  "dart --packages=bin/core_package_config.json bin/generate_pigeon.dart",
   "dart format lib/platform/",
 ]
 depends = ["//:open-api-dart"]
@@ -145,6 +145,10 @@ run = "dart format --set-exit-if-changed $(find lib -name '*.dart' -not \\( -nam
 [tasks."build:android"]
 description = "Build Android release"
 run = "flutter build appbundle"
+
+[tasks."build:apk"]
+description = "Build signed Android release APK"
+run = "flutter build apk --release"
 
 [tasks.install]
 alias = "install"
@@ -195,7 +199,7 @@ wait_for = ["//:i18n:format-fix"]
 description = "Generate i18n keys"
 hide = true
 run = [
-  "dart run bin/generate_keys.dart",
+  "dart --packages=bin/core_package_config.json bin/generate_keys.dart",
   "dart format lib/generated/translations.g.dart",
 ]
 wait_for = ["//:i18n:format-fix"]

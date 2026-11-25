@@ -14,7 +14,6 @@
     mdiDownload,
     mdiFeatureSearchOutline,
     mdiFormTextboxPassword,
-    mdiKeyOutline,
     mdiLockSmart,
     mdiServerOutline,
     mdiShieldKeyOutline,
@@ -34,7 +33,6 @@
   import UserApiKeyList from './UserApiKeyList.svelte';
   import UserPasskeyList from './UserPasskeyList.svelte';
   import UserProfileSettings from './UserProfileSettings.svelte';
-  import UserPurchaseSettings from './UserPurchaseSettings.svelte';
   import UserUsageStatistic from './UserUsageStatistic.svelte';
 
   const query = createPreloadedQuery(getUserConfigQuery);
@@ -145,16 +143,6 @@
   autoScrollTo={true}
 >
   <ChangePinCodeSettings />
-</SettingAccordion>
-
-<SettingAccordion
-  icon={mdiKeyOutline}
-  key={OpenQueryParam.PURCHASE_SETTINGS}
-  title={$t('user_purchase_settings')}
-  subtitle={$t('user_purchase_settings_description')}
-  autoScrollTo={true}
->
-  <UserPurchaseSettings />
 </SettingAccordion>
 
 <SettingAccordion

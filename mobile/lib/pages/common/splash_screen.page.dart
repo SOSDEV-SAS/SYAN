@@ -11,7 +11,6 @@ import 'package:immich_mobile/domain/models/config/app_config.dart';
 import 'package:immich_mobile/domain/models/store.model.dart';
 import 'package:immich_mobile/entities/store.entity.dart';
 import 'package:immich_mobile/extensions/platform_extensions.dart';
-import 'package:immich_mobile/generated/codegen_loader.g.dart';
 import 'package:immich_mobile/generated/translations.g.dart';
 import 'package:immich_mobile/infrastructure/repositories/settings.repository.dart';
 import 'package:immich_mobile/providers/app_life_cycle.provider.dart';
@@ -26,6 +25,7 @@ import 'package:immich_mobile/services/immich_logger.service.dart';
 import 'package:immich_mobile/theme/color_scheme.dart';
 import 'package:immich_mobile/theme/theme_data.dart';
 import 'package:immich_mobile/utils/fallback_localizations.dart';
+import 'package:immich_mobile/utils/syan_localization_loader.dart';
 import 'package:immich_mobile/widgets/common/immich_logo.dart';
 import 'package:immich_mobile/widgets/common/immich_title_text.dart';
 import 'package:logging/logging.dart';
@@ -46,10 +46,10 @@ class BootstrapErrorWidget extends StatelessWidget {
       path: translationsPath,
       useFallbackTranslations: true,
       fallbackLocale: locales.values.first,
-      assetLoader: const CodegenLoader(),
+      assetLoader: const SyanLocalizationLoader(),
       child: Builder(
         builder: (lCtx) => MaterialApp(
-          title: 'Immich',
+          title: 'S&AN',
           debugShowCheckedModeBanner: true,
           localizationsDelegates: [...lCtx.localizationDelegates, ...fallbackLocalizationDelegates],
           supportedLocales: lCtx.supportedLocales,
@@ -413,7 +413,7 @@ class SplashScreenPageState extends ConsumerState<SplashScreenPage> {
   Widget build(BuildContext context) {
     return const Scaffold(
       body: Center(
-        child: Image(image: AssetImage('assets/immich-logo.png'), width: 80, filterQuality: FilterQuality.high),
+        child: Image(image: AssetImage('assets/san-app-icon.png'), width: 80, filterQuality: FilterQuality.high),
       ),
     );
   }
