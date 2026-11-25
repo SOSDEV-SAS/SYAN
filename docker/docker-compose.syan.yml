@@ -12,6 +12,12 @@ services:
       - proxy
     environment:
       IMMICH_ALLOW_SETUP: 'false'
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - fetch('http://127.0.0.1:2283/api/server/ping').then((response) => response.json()).then((body) => process.exit(body.res === 'pong' ? 0: 1)).catch(() => process.exit(1))
     labels:
       traefik.enable: '${SYAN_PUBLIC_ENABLED:-false}'
       traefik.docker.network: proxy
