@@ -243,6 +243,9 @@ class ImmichAppState extends ConsumerState<ImmichApp> with WidgetsBindingObserve
     super.initState();
     unawaited(initApp().then((_) => dPrint(() => "App Init Completed")));
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
       // needs to be delayed so that EasyLocalization is working
       unawaited(ref.read(backgroundWorkerFgServiceProvider).enable());
       if (Platform.isAndroid) {
