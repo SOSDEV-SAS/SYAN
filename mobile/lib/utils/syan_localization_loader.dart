@@ -9,8 +9,13 @@ class SyanLocalizationLoader extends AssetLoader {
   @override
   Future<Map<String, dynamic>> load(String path, Locale locale) async {
     final translations = await const CodegenLoader().load(path, locale);
-    return _replaceBrand(translations) as Map<String, dynamic>;
+    return _replaceBrandMap(translations ?? const {});
   }
+
+  Map<String, dynamic> _replaceBrandMap(Map<String, dynamic> values) => {
+    for (final MapEntry(key: key, value: value) in values.entries)
+      key: _replaceBrand(value),
+  };
 
   dynamic _replaceBrand(dynamic value) {
     if (value is String) {
@@ -20,7 +25,7 @@ class SyanLocalizationLoader extends AssetLoader {
       return value.map(_replaceBrand).toList();
     }
     if (value is Map) {
-      return value.map((key, item) => MapEntry(key, _replaceBrand(item)));
+      return _replaceBrandMap(Map<String, dynamic>.from(value));
     }
     return value;
   }
